@@ -1,0 +1,24 @@
+{
+  "name": "to-do-list-1.0",
+  "version": "1.0.0",
+  "description": "Simple to-do list v1.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pratik-panda-5/To-do-List.git"
+  },
+  "keywords": [
+    "to",
+    "do",
+    "list"
+  ],
+  "author": "Pratik Panda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pratik-panda-5/To-do-List/issues"
+  },
+  "homepage": "https://github.com/pratik-panda-5/To-do-List#readme"
+}
