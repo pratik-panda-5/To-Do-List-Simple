@@ -35,6 +35,7 @@ const defaultItems = [item1, item2, item3];
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
+// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 app.get("/", function (req, res) {
   Item.find({}, (err, items) => {
@@ -54,24 +55,34 @@ app.get("/", function (req, res) {
 });
 
 app.get("/:listName", (req, res) => {
-    const name = req.params.listName;
-  List.findOne({ name: name }, (err, foundList) => {
-    if (!err) {
-      if (!foundList) {
-        
-        const list = new List({
-          name: name,
-          items: defaultItems,
+  const customListName = req.params.listName;
+  if (customListName != "favicon.ico") {
+    List.findOne({ name: customListName }, (err, foundList) => {
+      if (foundList != null) {
+        console.log("found existing");
+        res.render("list", { today: foundList.name, items: foundList.items });
+      } else {
+        const myP = new Promise((resolve, reject) => {
+          const list = new List({
+            name: customListName,
+            items: defaultItems,
+          });
+          list.save();
+          console.log("nahi tha toh add krdia");
+          resolve("bruh");
         });
-        list.save();
-        res.redirect('/'+name);
+        myP.then(() => {
+            console.log("render krdia after adding");
+          List.findOne({ name: customListName }, (err, foundList) => {
+            res.render("list", {
+              today: foundList.name,
+              items: foundList.items,
+            });
+          });
+        }, ()=>{});
       }
-      else
-      {
-        res.render('list', {today : name, items : foundList.items});
-      }
-    }
-  });
+    });
+  }
 });
 
 app.get("/about", function (req, res) {
