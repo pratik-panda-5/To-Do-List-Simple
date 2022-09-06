@@ -7,10 +7,7 @@ const date = require(__dirname + "/date.js");
 mongoose.connect("mongodb://127.0.0.1:27017/todolistDB");
 
 const itemSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
+  name: String,
 });
 const Item = mongoose.model("Item", itemSchema);
 
@@ -35,7 +32,6 @@ const defaultItems = [item1, item2, item3];
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
-// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 app.get("/", function (req, res) {
   Item.find({}, (err, items) => {
@@ -59,7 +55,6 @@ app.get("/:listName", (req, res) => {
   if (customListName != "favicon.ico") {
     List.findOne({ name: customListName }, (err, foundList) => {
       if (foundList != null) {
-        console.log("found existing");
         res.render("list", { today: foundList.name, items: foundList.items });
       } else {
         const myP = new Promise((resolve, reject) => {
@@ -71,15 +66,18 @@ app.get("/:listName", (req, res) => {
           console.log("nahi tha toh add krdia");
           resolve("bruh");
         });
-        myP.then(() => {
+        myP.then(
+          () => {
             console.log("render krdia after adding");
-          List.findOne({ name: customListName }, (err, foundList) => {
-            res.render("list", {
-              today: foundList.name,
-              items: foundList.items,
+            List.findOne({ name: customListName }, (err, foundList) => {
+              res.render("list", {
+                today: foundList.name,
+                items: foundList.items,
+              });
             });
-          });
-        }, ()=>{});
+          },
+          () => {}
+        );
       }
     });
   }
@@ -91,14 +89,23 @@ app.get("/about", function (req, res) {
 
 app.post("/", function (req, res) {
   let thing = req.body.newItem;
+  let listName = req.body.list;
   thing = thing.trim();
   if (thing != "") {
     const item = new Item({
       name: thing,
     });
-    item.save();
+    if (listName == date()) {
+      item.save();
+      res.redirect("/");
+    } else {
+      List.findOne({ name: listName }, (err, foundList) => {
+        foundList.items.push({name : thing});
+        foundList.save();
+        res.redirect("/" + listName);
+      });
+    }
   }
-  res.redirect("/");
 });
 
 app.post("/delete", (req, res) => {
