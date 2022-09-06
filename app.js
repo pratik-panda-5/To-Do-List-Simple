@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const _ = require('lodash');
 const app = express();
 const date = require(__dirname + "/date.js");
 
@@ -109,15 +110,31 @@ app.post("/", function (req, res) {
 });
 
 app.post("/delete", (req, res) => {
-  Item.deleteOne({ _id: req.body.checkbox }, (err) => {
-    if (err) {
-      console.log("vsad");
-    } else {
-      setTimeout(() => {
-        res.redirect("/");
-      }, 500);
-    }
-  });
+  let listName = req.body.listName;
+  let id = req.body.checkbox;
+  console.log(id);
+  if(listName == date())
+  {
+    Item.deleteOne({ _id: req.body.checkbox }, (err) => {
+      if (err) {
+        console.log("vsad");
+      } else {
+        setTimeout(() => {
+          res.redirect("/");
+        }, 500);
+      }
+    });
+  }
+  else
+  {
+    List.findOneAndUpdate({name : listName}, {$pull : { items : { _id : id}}}, (err, result)=>{
+      if(!err)
+      {
+        res.redirect("/" + listName);
+      }
+    });
+  }
+  
 });
 
 app.listen(3000, function () {

@@ -10,6 +10,7 @@
                     <p><%= items[i].name %></p>
                 </div>
             <%} %>
+            <input type="hidden" name="listName" value="<%= today %>">
         </form> 
         <form class="item" action="/" method="post">
             <input type="text" name="newItem" placeholder="Add Item" autocomplete="off">
